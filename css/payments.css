@@ -1,0 +1,111 @@
+/* Payments History Styles */
+.payment-history-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInUp 0.5s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-history-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981, #059669);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.payment-history-card:hover::before {
+    opacity: 1;
+}
+
+.payment-history-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.payment-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.payment-date {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 600;
+    background: rgba(99, 102, 241, 0.1);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.payment-amount {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 8px 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.payment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-painter {
+    font-size: 0.875rem;
+    color: #1e293b;
+    font-weight: 600;
+    background: rgba(99, 102, 241, 0.05);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.payment-notes {
+    font-size: 0.875rem;
+    color: #374151;
+    font-style: italic;
+    background: rgba(59, 130, 246, 0.05);
+    padding: 12px;
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+    line-height: 1.6;
+}
+
+.no-payments {
+    text-align: center;
+    padding: 60px 24px;
+    color: #64748b;
+}
+
+.no-payments-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.4;
+    color: #94a3b8;
+}
+
+.no-payments-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #475569;
+}

@@ -1,0 +1,224 @@
+/* Responsive Design */
+@media (min-width: 768px) {
+    .container {
+        padding: 48px;
+        margin: 24px;
+    }
+    
+    .logo h1 {
+        font-size: 3rem;
+    }
+    
+    .assignment-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .finances-modal {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .finances-content {
+        position: relative;
+        margin: 2vh auto;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 24px;
+        width: 95%;
+        max-width: 1000px;
+        height: 96vh;
+        box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .finances-header {
+        border-radius: 24px 24px 0 0;
+    }
+
+    .finances-summary {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+    }
+
+    .finance-amounts {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .amount-item.to-pay {
+        grid-column: auto;
+    }
+
+    .finances-cards {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .container {
+        padding: 24px;
+        margin: 12px;
+        border-radius: 20px;
+    }
+    
+    .logo h1 {
+        font-size: 2.25rem;
+    }
+    
+    .assignment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .top-buttons {
+        top: 16px;
+        right: 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .logout-btn, .finances-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        padding: 16px;
+        width: 95%;
+        height: 95%;
+    }
+
+    .modal-controls {
+        margin-top: 20px;
+        gap: 12px;
+    }
+
+    .modal-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+
+    .close-x {
+        top: 16px;
+        right: 20px;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .download-actions {
+        margin-top: 12px;
+        gap: 10px;
+    }
+
+    .download-btn, .complete-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .summary-card-value {
+        font-size: 1.75rem;
+    }
+
+    .amount-value {
+        font-size: 1.25rem;
+    }
+
+    .payment-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .payment-amount {
+        align-self: flex-end;
+        font-size: 1.125rem;
+    }
+
+    .assignment-card {
+        padding: 20px;
+    }
+
+    .assignment-image {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+        margin: 8px;
+    }
+
+    .logo h1 {
+        font-size: 2rem;
+    }
+
+    .finances-header {
+        padding: 20px;
+    }
+
+    .finances-header h3 {
+        font-size: 1.5rem;
+    }
+
+    .finances-body {
+        padding: 20px;
+    }
+
+    .finance-card {
+        padding: 20px;
+    }
+
+    .summary-card {
+        padding: 20px;
+    }
+
+    .summary-card-icon {
+        font-size: 2rem;
+    }
+
+    .summary-card-value {
+        font-size: 1.5rem;
+    }
+
+    .amount-value {
+        font-size: 1.125rem;
+    }
+
+    .payment-history-card {
+        padding: 16px;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+
+    .input-group input {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .container {
+        padding: 16px;
+        margin: 4px;
+    }
+
+    .logo h1 {
+        font-size: 1.75rem;
+    }
+
+    .assignment-card {
+        padding: 16px;
+    }
+
+    .finance-card {
+        padding: 16px;
+    }
+
+    .summary-card {
+        padding: 16px;
+    }
+
+    .modal-btn, .confirm-yes, .confirm-no {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}

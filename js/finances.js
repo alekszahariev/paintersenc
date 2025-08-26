@@ -78,6 +78,12 @@ function displayFinancialData(data) {
     const taskCount = parseInt(summary.Tasks) || 0;
     const tasksText = taskCount === 1 ? `${taskCount} Задание` : `${taskCount} Задания`;
 
+    const contractLinkHtml = currentUser?.contractUrl ? `
+        <div class="amount-item" style="grid-column: 1 / -1;">
+            <div class="amount-label">Договор</div>
+            <div class="amount-value"><a href="${currentUser.contractUrl}" target="_blank">Отвори договора (PDF)</a></div>
+        </div>` : '';
+
     card.innerHTML = `
         <div class="finance-card-header">
             <div class="tasks-count">${tasksText}</div>
@@ -97,6 +103,7 @@ function displayFinancialData(data) {
                 <div class="amount-label">За изплащане</div>
                 <div class="amount-value">${(summary['To pay now'] || 0).toFixed(2)} лв.</div>
             </div>
+            ${contractLinkHtml}
         </div>
     `;
     

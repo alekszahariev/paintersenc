@@ -1,4 +1,3 @@
-// Автентификация и login/logout
 async function login() {
     const artistNumber = document.getElementById('artistNumber').value.trim();
     const artistPassword = document.getElementById('artistPassword').value.trim();
@@ -36,20 +35,61 @@ async function login() {
         loginBtn.disabled = false;
         
         if (response.ok) {
-            const data = await response.json();
-            
-            if (data.message) {
-                showError(data.message);
+            const raw = await response.json();
+
+            // Normalize n8n-style [{ json: {...} }] or direct object/array
+            const payload = Array.isArray(raw)
+                ? (raw[0]?.json ?? raw[0])
+                : (raw?.json ?? raw);
+
+            if (payload && payload.message) {
+                showError(payload.message);
                 return;
             }
-            
-            if (Array.isArray(data) && data.length > 0) {
-                currentUser = {
-                    artist_number: artistNumber,
-                    password: artistPassword
-                };
-                assignmentsData = data;
-                showAssignments(data);
+
+            // Prefer payload.orders (new format). Fallback to raw array (old format).
+            let orders = Array.isArray(payload?.orders) ? payload.orders : [];
+            if (!orders.length && Array.isArray(raw) && raw.length && !raw[0]?.json) {
+                orders = raw;
+            }
+
+            // Extract contract URL (new format: payload.contract is array with { url })
+            let contractUrl = null;
+            if (Array.isArray(payload?.contract) && payload.contract.length > 0) {
+                contractUrl = payload.contract[0]?.url || null;
+            } else if (typeof payload?.contract === 'string' && payload.contract.startsWith('http')) {
+                contractUrl = payload.contract;
+            }
+
+            // Always set currentUser
+            currentUser = {
+                artist_number: artistNumber,
+                password: artistPassword,
+                artist_name: payload?.artist_name || null,
+                contract: payload?.contract ?? null,
+                contractUrl: contractUrl
+            };
+
+            // Map assignments if any
+            assignmentsData = (orders || []).map(o => ({
+                url: o?.url || o?.url2 || '',
+                url2: o?.url2 || null,
+                due_date: o?.due_date || '',
+                note_for_painters: o?.note_for_painters || '',
+                order_id: o?.order_id || null,
+                painter_salary: o?.painter_salary || null,
+                artist_name: payload?.artist_name || null
+            }));
+
+            // If contract URL is missing, start the contract wizard
+            const contractMissing = !currentUser.contractUrl;
+            if (contractMissing) {
+                showContractWizard();
+                return;
+            }
+
+            if (assignmentsData.length > 0) {
+                showAssignments(assignmentsData);
             } else {
                 showError('Няма налични задания за този номер');
             }
@@ -81,19 +121,45 @@ async function login() {
 }
 
 function logout() {
-    document.getElementById('loginScreen').style.display = 'block';
-    document.getElementById('assignmentsScreen').style.display = 'none';
-    document.querySelector('.top-buttons').style.display = 'none';
-    document.getElementById('artistNumber').value = '';
-    document.getElementById('artistPassword').value = '';
-    document.getElementById('errorMessage').style.display = 'none';
-    currentUser = null;
-    pendingCompleteData = null;
-    assignmentsData = [];
+    try {
+        // Reset UI screens
+        document.getElementById('loginScreen').style.display = 'block';
+        const assignments = document.getElementById('assignmentsScreen');
+        if (assignments) assignments.style.display = 'none';
+        const topButtons = document.querySelector('.top-buttons');
+        if (topButtons) topButtons.style.display = 'none';
+        const wizard = document.getElementById('contractWizard');
+        if (wizard) wizard.style.display = 'none';
+
+        // Close modals if open
+        const imageModal = document.getElementById('imageModal');
+        if (imageModal) imageModal.style.display = 'none';
+        const confirmModal = document.getElementById('confirmationModal');
+        if (confirmModal) confirmModal.style.display = 'none';
+        const financesModal = document.getElementById('financesModal');
+        if (financesModal) financesModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+
+        // Clear inputs and state
+        const artistNumber = document.getElementById('artistNumber');
+        const artistPassword = document.getElementById('artistPassword');
+        if (artistNumber) artistNumber.value = '';
+        if (artistPassword) artistPassword.value = '';
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) errorMessage.style.display = 'none';
+        currentUser = null;
+        pendingCompleteData = null;
+        assignmentsData = [];
+        const list = document.getElementById('assignmentsList');
+        if (list) list.innerHTML = '';
+    } catch (e) {
+        // no-op
+    }
 }
 
 function showError(message) {
     const errorMessage = document.getElementById('errorMessage');
+    if (!errorMessage) return;
     errorMessage.textContent = message;
     errorMessage.style.display = 'block';
 }

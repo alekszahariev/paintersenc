@@ -38,6 +38,7 @@ function showAssignments(assignments) {
             </div>` : '';
 
         const escapedUrl = assignment.url.replace(/'/g, "\\'");
+        const escapedUrl2 = (assignment.url2 || '').replace(/'/g, "\\'");
         const escapedNote = (assignment.note_for_painters || '').replace(/'/g, "\\'");
 
         // Add order number display
@@ -62,6 +63,11 @@ function showAssignments(assignments) {
                     <button class="download-btn" onclick="openModal('${escapedUrl}', ${index + 1}, '${escapedNote}')">
                         🔍 Разгледай
                     </button>
+                    ${assignment.url2 ? `
+                    <button class="download-btn" onclick="openModal('${escapedUrl2}', ${index + 1}, '${escapedNote}')">
+                        🖼️ Виж оригинала
+                    </button>
+                    ` : ''}
                     <button class="complete-btn" onclick="markAsComplete(${index + 1}, '${escapedUrl}')">
                         ✅ ГОТОВА
                     </button>

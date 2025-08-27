@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Еконт — Пратки</title>
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --primary: #2563eb;
+            --ok: #10b981;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --border: #e5e7eb;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        }
+        .wrapper { max-width: 980px; margin: 0 auto; padding: 16px; }
+        .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 16px; }
+        .title { font-size: 18px; font-weight: 700; }
+        .actions { display: flex; gap: 8px; }
+        button { background: var(--primary); color: #fff; border: 0; padding: 10px 14px; border-radius: 10px; font-weight: 600; }
+        button.secondary { background: #f3f4f6; color: var(--text); border: 1px solid var(--border); }
+
+        .list { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 640px) { .list { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { .list { grid-template-columns: 1fr 1fr 1fr; } }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 6px 16px rgba(0,0,0,0.05); }
+        .card-img { width: 100%; aspect-ratio: 4/3; background: #f3f4f6; display: flex; align-items: center; justify-content: center; }
+        .card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 12px; }
+        .row { display: flex; gap: 6px; margin: 6px 0; align-items: baseline; }
+        .label { color: var(--muted); min-width: 90px; font-size: 13px; }
+        .value { font-weight: 600; }
+        .address { font-weight: 500; white-space: pre-wrap; }
+
+        .status { display: inline-block; margin-top: 8px; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); }
+        .status.ok { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+        .status.warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+        .status.danger { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+        .status.neutral { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
+
+        .loading, .error, .empty { text-align: center; color: var(--muted); padding: 16px 8px; }
+
+        /* Auth overlay */
+        #auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .auth-card { width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: 0 12px 28px rgba(0,0,0,0.06); }
+        .auth-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .auth-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+        .input { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 15px; }
+        .auth-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+        .auth-error { color: var(--danger); font-weight: 600; margin-top: 8px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="auth">
+        <div class="auth-card">
+            <div class="auth-title">🔐 Достъп до Еконт списък</div>
+            <div class="auth-sub">Моля, въведете паролата.</div>
+            <input id="pwd" type="password" class="input" placeholder="Парола" autocomplete="current-password" />
+            <div class="auth-actions">
+                <button class="secondary" id="authCancel">Затвори</button>
+                <button id="authSubmit">Вход</button>
+            </div>
+            <div id="authError" class="auth-error">Грешна парола</div>
+        </div>
+    </div>
+
+    <div id="app" style="display:none;">
+        <div class="wrapper">
+            <div class="toolbar">
+                <div class="title">📦 Пратки за Еконт</div>
+                <div class="actions">
+                    <button class="secondary" id="refreshBtn">Обнови</button>
+                    <button class="secondary" id="logoutBtn">Изход</button>
+                </div>
+            </div>
+            <div id="loading" class="loading" style="display:none;">Зареждане...</div>
+            <div id="error" class="error" style="display:none;">Грешка при зареждане на данните</div>
+            <div id="orders" class="list"></div>
+        </div>
+    </div>
+
+    <script>
+    // Set your webhook URL here
+    const WEBHOOK_URL = 'https://n8n.enchantiya.com/webhook/6422525a-02bc-4f9c-928c-99b7b89c89fe';
+    const PASSWORD = 'valia';
+
+    function showAuth() {
+        document.getElementById('auth').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+    }
+    function showApp() {
+        document.getElementById('auth').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        fetchData();
+    }
+    function checkAuth() {
+        const ok = sessionStorage.getItem('econtAuth') === '1';
+        if (ok) showApp(); else showAuth();
+    }
+    function login() {
+        const input = document.getElementById('pwd');
+        const err = document.getElementById('authError');
+        if ((input.value || '').trim() === PASSWORD) {
+            sessionStorage.setItem('econtAuth', '1');
+            err.style.display = 'none';
+            showApp();
+        } else {
+            err.style.display = 'block';
+        }
+    }
+    function logout() {
+        sessionStorage.removeItem('econtAuth');
+        location.reload();
+    }
+
+    async function fetchData() {
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const ordersEl = document.getElementById('orders');
+        loading.style.display = 'block';
+        error.style.display = 'none';
+        ordersEl.innerHTML = '';
+        try {
+            const cacheBust = (WEBHOOK_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now();
+            const url = WEBHOOK_URL + cacheBust;
+            const data = await fetchWithFallback(url);
+            renderList(data);
+        } catch (e) {
+            error.style.display = 'block';
+            error.textContent = 'Грешка при зареждане на данните';
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    async function fetchWithFallback(url) {
+        try {
+            return await fetchJson(url);
+        } catch (e) {
+            // CORS fallback using AllOrigins proxy (GET only)
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+            return await fetchJson(proxyUrl);
+        }
+    }
+
+    async function fetchJson(url) {
+        const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('orders');
+        const actual = Array.isArray(data) ? data[0] : data;
+        const orders = actual && Array.isArray(actual.orders) ? actual.orders : [];
+        if (!orders.length) {
+            container.innerHTML = '<div class="empty">Няма поръчки</div>';
+            return;
+        }
+        orders.forEach(order => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const badge = badgeClass(order.status);
+            card.innerHTML = `
+                <div class="card-img">
+                    <img src="${escapeHtml(order.figurine_image || '')}" alt="Фигура" loading="lazy" />
+                </div>
+                <div class="card-body">
+                    <div class="row"><span class="label">Клиент:</span><span class="value">${escapeHtml(order.customer_name || '-') }</span></div>
+                    <div class="row"><span class="label">Поръчка:</span><span class="value">#${escapeHtml(String(order.order_id || ''))}</span></div>
+                    <div class="row"><span class="label">Телефон:</span><span class="value"><a href="tel:${escapeTel(order.phone || '')}">${escapeHtml(order.phone || '')}</a></span></div>
+                    <div class="row"><span class="label">Адрес:</span><span class="value address">${escapeHtml(order.address || '')}</span></div>
+                    <div class="status ${badge}">${escapeHtml(order.status || '')}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function badgeClass(status) {
+        const s = (status || '').toLowerCase();
+        if (s.includes('готов')) return 'ok';
+        if (s.includes('изпращ')) return 'ok';
+        if (s.includes('забав')) return 'warn';
+        if (s.includes('проблем')) return 'danger';
+        return 'neutral';
+    }
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+    function escapeTel(s) { return (s || '').replace(/\s+/g, ''); }
+
+    // Events
+    document.addEventListener('DOMContentLoaded', checkAuth);
+    document.getElementById('authSubmit').addEventListener('click', login);
+    document.getElementById('pwd').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+    document.getElementById('authCancel').addEventListener('click', () => { document.getElementById('pwd').value=''; });
+    document.getElementById('refreshBtn').addEventListener('click', fetchData);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    </script>
+</body>
+</html>
+

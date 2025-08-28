@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>3D Model — Side/Back Views Generator</title>
+    <link rel="stylesheet" href="styles.css?v=nc1">
+</head>
+<body>
+    <div id="results" class="gallery"></div>
+
+    <div class="toolbar" role="region" aria-label="Controls">
+        <div class="toolbar-inner">
+            <div class="tl-section tl-upload">
+                <label class="tl-label">Reference</label>
+                <input id="imageFile" type="file" accept="image/*" />
+                <div id="filePreview" class="thumb" style="display:none;"></div>
+            </div>
+
+            <div class="tl-section tl-prompt">
+                <div class="presets">
+                    <button class="preset" data-prompt="back view of the object, consistent style, match materials">Back</button>
+                    <button class="preset" data-prompt="left side view of the object, consistent style, match materials">Left</button>
+                    <button class="preset" data-prompt="right side view of the object, consistent style, match materials">Right</button>
+                    <button class="preset" data-prompt="back and side details, consistent textures, realistic shading">Detailed</button>
+                </div>
+                <div class="chat">
+                    <textarea id="positive" class="chat-input" rows="2" placeholder="Describe the desired side/back view..."></textarea>
+                </div>
+                <details class="neg-wrap">
+                    <summary>Negative prompt</summary>
+                    <textarea id="negative" rows="2" placeholder="What to avoid"></textarea>
+                </details>
+            </div>
+
+            <div class="tl-section tl-actions">
+                <label class="tl-label">Results</label>
+                <input id="num" type="number" min="1" max="4" step="1" />
+                <button id="generate">Generate</button>
+                <button class="secondary" id="clear">Clear</button>
+            </div>
+        </div>
+        <div id="loading" class="loading" style="display:none;">Generating...</div>
+        <div id="error" class="error" style="display:none;"></div>
+    </div>
+
+    <script src="config.js?v=nc1"></script>
+    <script src="app.js?v=nc1"></script>
+</body>
+</html>
+
